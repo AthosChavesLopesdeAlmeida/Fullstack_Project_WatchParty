@@ -7,4 +7,14 @@ export const registerSchema = z.object({
   pfp: z.string()
 });
 
+export const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8),
+});
+
+export const deleteSchema = z.object({
+  password: z.string().min(8),
+});
+
+
 export type RegisterInput = z.infer<typeof registerSchema>;
