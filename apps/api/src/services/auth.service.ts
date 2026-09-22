@@ -12,12 +12,12 @@ export const authService = {
         }
 
         // Verifica se o email já foi cadastrado
-        const existing = userRepository.findByEmail(email)
+        const existing = await userRepository.findByEmail(email)
         if (existing) throw new Error('Email already registered')
 
         // Criptografa a senha
-        const password_hash = await bcrypt.hash(password, 10)
-        const user = await userRepository.create(email, password_hash, username, pfp)
+        const passwordHash = await bcrypt.hash(password, 10)
+        const user = await userRepository.create(email, passwordHash, username, pfp)
 
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' })
         return { user: {id: user.id, username: user.username, email: user.email}, token }
@@ -30,11 +30,11 @@ export const authService = {
         }
 
         // Verifica se o email já foi cadastrado
-        const user = userRepository.findByEmail(email)
+        const user = await userRepository.findByEmail(email)
         if (!user) throw new Error('Account not found')
  
         // Compara a senha
-        const passwordIsValid = await bcrypt.compare(password, user.password_hash)
+        const passwordIsValid = await bcrypt.compare(password, user.passwordHash)
         if (!passwordIsValid) throw new Error('Invalid password')
 
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' })
@@ -52,7 +52,7 @@ export const authService = {
         if (!user) throw new Error('Account not found')
 
         // Compara a senha
-        const passwordIsValid = await bcrypt.compare(password, user.password_hash)
+        const passwordIsValid = await bcrypt.compare(password, user.passwordHash)
         if (!passwordIsValid) throw new Error('Invalid password')
 
         await userRepository.delete(id, password)

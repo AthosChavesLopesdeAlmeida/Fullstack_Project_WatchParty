@@ -11,15 +11,16 @@ export const userRepository = {
         return await db.query.users.findFirst({ where: eq(users.email, email) })
     },
 
-    async create(email: string, password_hash: string, username: string, pfp: string) {
-        return await db.insert(users).values({ email: email, passwordHash: password_hash, username: username, pfp: pfp })
+    async create(email: string, passwordHash: string, username: string, pfp?: string) {
+        const [user] = await db.insert(users).values({ email: email, passwordHash: passwordHash, username: username, pfp: pfp }).returning()
+        return user
     },
 
     // Precisa do ID do usuário para excluir conta e senha para confirmar
-    async delete (id: string, password_hash: string) {
+    async delete (id: string, passwordHash: string) {
         return await db.delete(users).where(
             and(
-                eq(users.id, id), eq(users.passwordHash, password_hash)
+                eq(users.id, id), eq(users.passwordHash, passwordHash)
             )
         )
     }

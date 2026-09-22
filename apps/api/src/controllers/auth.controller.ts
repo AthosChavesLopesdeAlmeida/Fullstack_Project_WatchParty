@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { registerSchema, loginSchema, deleteSchema } from '@watch-party/schema'
+import { registerSchema, loginSchema, deleteSchema } from '@watch-party/schemas'
 import { authService } from "../services/auth.service";
 
 // Quando há token (com ID) na request, usamos este extend
