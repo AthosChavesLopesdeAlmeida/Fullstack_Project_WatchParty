@@ -1,11 +1,14 @@
 import { userRepository } from "@watch-party/db";
+import { DeleteInput, LoginInput, RegisterInput } from "@watch-party/schemas";
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 const JWT_SECRET = process.env.JWT_SECRET!
 
 export const authService = {
-    async register (email: string, password: string, username: string, pfp?: string) {
+    async register (data: RegisterInput) {
+        const { email, password, username, pfp } = data;
+
         // Todos os campos (exceto pfp) são obrigatórios
         if (!email || !password || !username) {
             throw new Error('Missing information')
@@ -23,7 +26,9 @@ export const authService = {
         return { user: {id: user.id, username: user.username, email: user.email}, token }
     },
 
-    async login (email: string, password: string) {
+    async login (data: LoginInput) {
+        const { email, password } = data
+
         // Todos os campos são obrigatórios
         if (!email || !password ) {
             throw new Error('Missing information')
@@ -41,7 +46,9 @@ export const authService = {
         return { user: {id: user.id, username: user.username, email: user.email}, token }
     },
 
-    async delete (id: string, password: string) {
+    async delete (id: string, data: DeleteInput) {
+        const { password } = data
+        
         // Todos os campos são obrigatórios
         if (!password) {
             throw new Error('Missing information')

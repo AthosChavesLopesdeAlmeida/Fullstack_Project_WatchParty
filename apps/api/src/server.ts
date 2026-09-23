@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.routes'
+import friendshipRoutes from './routes/friendship.routes'
 
 const app = express()
 
@@ -13,7 +14,11 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json())
 
-app.use('/api/auth', authRoutes)
+// Rotas de autenticação
+app.use('/api', authRoutes)
+
+// Rotas relacionadas às amizades
+app.use('/api', friendshipRoutes)
 
 const PORT = process.env.PORT || 3333
 app.listen(PORT, () => console.log(`App running on port ${PORT}`))

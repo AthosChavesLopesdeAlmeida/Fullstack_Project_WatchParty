@@ -13,8 +13,7 @@ export const authController = {
         const isProduction = process.env.NODE_ENV === 'production'
 
         try {
-            const { email, password, username, pfp } = data
-            const { user, token } = await authService.register(email, password, username, pfp)
+            const { user, token } = await authService.register(data)
 
             res.cookie('token', token, {
                 httpOnly: true,
@@ -35,8 +34,7 @@ export const authController = {
         const isProduction = process.env.NODE_ENV === 'production'    
 
         try {
-            const { email, password } = data
-            const { user, token } = await authService.login(email, password)
+            const { user, token } = await authService.login(data)
 
             res.cookie('token', token, {
                 httpOnly: true,
@@ -57,9 +55,7 @@ export const authController = {
         const userId = req.userId! 
 
         try {
-            const { password } = data
-
-            await authService.delete(userId, password)
+            await authService.delete(userId, data)
 
             res.clearCookie('token', { path: '/' })
             res.status(204).send()
