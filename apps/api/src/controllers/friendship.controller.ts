@@ -15,8 +15,9 @@ export const friendshipController = {
         try {
             const friendRequest = await friendshipService.sendRequest(userId, data)
             res.status(201).json({friendRequest})
-        } catch {
-            res.status(404).json({ error: 'Unable to send request' })
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to send request'
+            res.status(400).json({ error: message })
         }
     },
 
@@ -27,8 +28,9 @@ export const friendshipController = {
         try {
             await friendshipService.acceptRequest(friendshipId, userId)
             res.status(200).send()
-        } catch {
-            res.status(401).json({ error: 'Unable to accept request' })
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to accept request'
+            res.status(404).json({ error: message })
         }
     },
 
@@ -39,8 +41,9 @@ export const friendshipController = {
         try {
             await friendshipService.rejectRequest(friendshipId, userId)
             res.status(200).send()
-        } catch {
-            res.status(401).json({ error: 'Unable to reject request' })
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to reject request'
+            res.status(404).json({ error: message })
         }
     },
 
@@ -50,8 +53,9 @@ export const friendshipController = {
         try {
             await friendshipService.removeFriend(friendshipId, userId)
             res.status(204).send()
-        } catch {
-            res.status(400).json({ error: 'Unable to remove friend' })
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to remove friend'
+            res.status(404).json({ error: message })
         }
     },
 
@@ -61,8 +65,9 @@ export const friendshipController = {
         try {
             const friends = await friendshipService.listFriends(userId)
             res.status(200).json({friends})
-        } catch {
-            res.status(401).json({json: 'Unable to find friends'})
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to list friends'
+            res.status(401).json({ error: message })
         }
     },
 
@@ -72,8 +77,9 @@ export const friendshipController = {
         try {
             const pendingRequests = await friendshipService.listPendingRequests(userId)
             res.status(200).json({pendingRequests})
-        } catch {
-            res.status(401).json({json: 'Unable to find requests'})
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to list pending requests'
+            res.status(401).json({ error: message })
         }
     }
 } 
