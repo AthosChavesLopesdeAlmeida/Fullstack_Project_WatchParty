@@ -15,6 +15,13 @@
       "when": 1790107417763,
       "tag": "0001_woozy_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790206058611,
+      "tag": "0002_modern_malcolm_colcord",
+      "breakpoints": true
     }
   ]
 }
