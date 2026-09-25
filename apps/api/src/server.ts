@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.routes'
 import friendshipRoutes from './routes/friendship.routes'
+import videoRoutes from './routes/video.routes'
 
 const app = express()
 
@@ -19,6 +20,9 @@ app.use('/api', authRoutes)
 
 // Rotas relacionadas às amizades
 app.use('/api', friendshipRoutes)
+
+// Rotas relacionadas aos vídeos
+app.use('/api', videoRoutes)
 
 const PORT = process.env.PORT || 3333
 app.listen(PORT, () => console.log(`App running on port ${PORT}`))
