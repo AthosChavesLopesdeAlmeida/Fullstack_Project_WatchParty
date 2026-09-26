@@ -1,5 +1,11 @@
 import { videosRepository } from "@watch-party/db";
 import { CreateVideoInput } from "@watch-party/schemas";
+import { deleteObject, generatePresignedUploadUrl } from "../lib/s3";
+
+function extractKeyFromUrl(url: string): string {
+  const parsed = new URL(url);
+  return parsed.pathname.slice(1); // remove a barra inicial
+}
 
 export const videosService = {
     async createVideo (posterId: string, data: CreateVideoInput) {
@@ -8,10 +14,7 @@ export const videosService = {
         const rawKey = `${posterId}/${crypto.randomUUID()}-${videoName}`;
         const video = await videosRepository.create(posterId, videoName, rawKey);
 
-        // 25/09 - Funcionalidades de fila e worker ainda não criadas
-        const uploadUrl = await generatePressignedUploadUrl(rawKey, {
-            maxSizeBytes: 500 * 1024 * 1024
-        })
+        const uploadUrl = await generatePresignedUploadUrl(rawKey)
 
         return { video, uploadUrl }
     },
