@@ -25,14 +25,15 @@ export const videosService = {
 
         if (!video) throw new Error('Video not found')
         if (video.posterId !== posterId) throw new Error('Unauthorized')
-
+              
+        const updatedVideo = await videosRepository.markAsProcessing(videoId)
         // Adiciona à fila do Redis (que usa BullMQ)  
         await videoQueue.add("transcode", { 
             videoId: video.id,
             rawKey: video.rawKey,
         });
 
-        return video
+        return updatedVideo
     },
 
     async getVideo(videoId: string, requesterId: string) {
