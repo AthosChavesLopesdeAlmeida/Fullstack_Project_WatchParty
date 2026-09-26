@@ -20,6 +20,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1136.0",
     "@watch-party/db": "*",
     "@watch-party/schemas": "*",
+    "@watch-party/queue": "*",
     "bcrypt": "^6.0.0",
     "bullmq": "^6.3.8",
     "cookie-parser": "^1.4.7",

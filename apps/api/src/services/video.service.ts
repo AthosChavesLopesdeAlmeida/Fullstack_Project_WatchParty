@@ -1,6 +1,7 @@
 import { videosRepository } from "@watch-party/db";
 import { CreateVideoInput } from "@watch-party/schemas";
 import { deleteObject, generatePresignedUploadUrl } from "../lib/s3";
+import { videoQueue } from "@watch-party/queue";
 
 function extractKeyFromUrl(url: string): string {
   const parsed = new URL(url);
@@ -25,7 +26,7 @@ export const videosService = {
         if (!video) throw new Error('Video not found')
         if (video.posterId !== posterId) throw new Error('Unauthorized')
 
-        // 25/09 - Funcionalidades de fila e worker ainda não criadas   
+        // Adiciona à fila do Redis (que usa BullMQ)  
         await videoQueue.add("transcode", { 
             videoId: video.id,
             rawKey: video.rawKey,
