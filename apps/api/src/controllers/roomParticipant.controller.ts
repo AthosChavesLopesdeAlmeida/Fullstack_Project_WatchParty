@@ -56,4 +56,17 @@ export const roomParticipantsController = {
             res.status(400).json({ error: message })
         }
     },
+
+    async kick(req: AuthRequest<{ roomId: string; targetUserId: string }>, res: Response) {
+        const requesterId = req.userId!;
+        const { roomId, targetUserId } = req.params;
+
+        try {
+            await roomParticipantsService.remove(targetUserId, roomId, requesterId);
+            res.status(204).send();
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unable to remove participant";
+            res.status(400).json({ error: message });
+        }
+    },
 }
