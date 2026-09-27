@@ -1,6 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../client";
 import { roomParticipants } from "../schema";
+import { rooms } from "../schema";
 
 export const roomParticipantsRepository = {
     async invite (invitedId: string, roomId: string) {
@@ -37,5 +38,22 @@ export const roomParticipantsRepository = {
                 eq(roomParticipants.roomId, roomId)
             )
         )
-    }
-}
+    },
+
+    async isUserInRoomWithVideo(userId: string, videoId: string): Promise<boolean> {
+        const result = await db
+        .select({ userId: roomParticipants.userId })
+        .from(roomParticipants)
+        .innerJoin(rooms, eq(roomParticipants.roomId, rooms.id))
+        .where(
+            and(
+            eq(roomParticipants.userId, userId),
+            eq(roomParticipants.invitationStatus, "accepted"),
+            eq(rooms.currentVideoId, videoId),
+            ),
+        )
+        .limit(1);
+
+        return result.length > 0;
+    },
+};

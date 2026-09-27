@@ -2,6 +2,7 @@ import { videosRepository } from "@watch-party/db";
 import { CreateVideoInput } from "@watch-party/schemas";
 import { deleteObject, generatePresignedUploadUrl } from "../lib/s3";
 import { videoQueue } from "@watch-party/queue";
+import { roomParticipantsRepository } from "@watch-party/db";
 
 function extractKeyFromUrl(url: string): string {
   const parsed = new URL(url);
@@ -41,7 +42,7 @@ export const videosService = {
         if (!video) throw new Error("Video not found");
 
         const isOwner = video.posterId === requesterId;
-        const isRoomParticipant = await roomParticipantRepository.isUserInRoomWithVideo(requesterId, videoId);
+        const isRoomParticipant = await roomParticipantsRepository.isUserInRoomWithVideo(requesterId, videoId);
         // ^ método que ainda não existe, porque a tabela rooms/room_participants não existe ainda
 
         if (!isOwner && !isRoomParticipant) throw new Error("No authorization to watch this video");

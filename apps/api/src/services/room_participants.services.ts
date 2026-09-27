@@ -1,0 +1,52 @@
+import { roomRepository } from "@watch-party/db";
+import { roomParticipantsRepository } from "@watch-party/db";
+import { userRepository } from "@watch-party/db";
+
+export const roomParticipantsService = {
+    async invite(hostRequestId: string, invitedId: string, roomId: string) {
+        const existingUser = await userRepository.findById(invitedId);
+        if (!existingUser) throw new Error("User not found");
+
+        const existingRoom = await roomRepository.findById(roomId);
+        if (!existingRoom) throw new Error("Room not found");
+
+        if (existingRoom.hostId !== hostRequestId) {
+            throw new Error("Only the host can invite participants");
+        }
+
+        return roomParticipantsRepository.invite(invitedId, roomId);
+    },
+
+    async enterRoom (invitedId: string, roomId: string) {
+        const existingUser = await userRepository.findById(invitedId)
+        if (!existingUser) throw new Error("User not found")
+
+        const existingRoom = await roomRepository.findById(roomId)
+        if (!existingRoom) throw new Error("Room not found")
+
+        const participant = await roomParticipantsRepository.enterRoom(invitedId, roomId)
+        return participant     
+    },
+
+    async remove (userId: string, roomId: string, requesterId: string) {
+        const existingUser = await userRepository.findById(userId)
+        if (!existingUser) throw new Error("User not found")
+
+        const existingRoom = await roomRepository.findById(roomId)
+        if (!existingRoom) throw new Error("Room not found")     
+
+        if (requesterId !== userId || requesterId !== existingRoom.hostId) {
+            throw new Error("You cannot remove other participant without being the host or the participant in question")
+        }
+
+        await roomParticipantsRepository.remove(userId, roomId)
+    },
+
+    async listParticipants (roomId: string) {
+        const existingRoom = await roomRepository.findById(roomId)
+        if (!existingRoom) throw new Error("Room not found") 
+
+        const participants = await roomParticipantsRepository.listParticipants(roomId)
+        return participants
+    }
+}
