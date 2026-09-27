@@ -37,6 +37,8 @@ export const roomService = {
         const existingRoom = await roomRepository.findById(roomId)
         if (!existingRoom) throw new Error("Room not found")
 
+        if (existingRoom.hostId !== userId) throw new Error("Only the host can delete the room")
+
         return await roomRepository.delete(roomId, userId) 
     }
 }

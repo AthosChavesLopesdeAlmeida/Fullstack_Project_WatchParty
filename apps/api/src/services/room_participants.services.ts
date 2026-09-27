@@ -28,20 +28,20 @@ export const roomParticipantsService = {
         return participant     
     },
 
-    async remove (userId: string, roomId: string, requesterId: string) {
-        const existingUser = await userRepository.findById(userId)
-        if (!existingUser) throw new Error("User not found")
+    async remove(targetUserId: string, roomId: string, requesterId: string) {
+        const existingRoom = await roomRepository.findById(roomId);
+        if (!existingRoom) throw new Error("Room not found");
 
-        const existingRoom = await roomRepository.findById(roomId)
-        if (!existingRoom) throw new Error("Room not found")     
+        const isSelfRemoval = requesterId === targetUserId;
+        const isHostRemoving = requesterId === existingRoom.hostId;
 
-        if (requesterId !== userId || requesterId !== existingRoom.hostId) {
-            throw new Error("You cannot remove other participant without being the host or the participant in question")
+        if (!isSelfRemoval && !isHostRemoving) {
+            throw new Error("Apenas o host pode remover outros participantes");
         }
 
-        await roomParticipantsRepository.remove(userId, roomId)
+        await roomParticipantsRepository.remove(targetUserId, roomId);
     },
-
+    
     async listParticipants (roomId: string) {
         const existingRoom = await roomRepository.findById(roomId)
         if (!existingRoom) throw new Error("Room not found") 
