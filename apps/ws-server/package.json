@@ -5,21 +5,29 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "dotenv": "^18.0.4",
     "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
+    "socket.io": "^4.8.4",
     "ws": "^8.21.3",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "@watch-party/db": "*"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^26.6.2",
-    "@types/ws": "^8.18.1"
+    "@types/node": "^26.6.3",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
   }
 }
