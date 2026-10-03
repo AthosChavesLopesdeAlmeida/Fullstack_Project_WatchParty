@@ -67,5 +67,17 @@ export const authController = {
     async logout(req: Request, res: Response) {
         res.clearCookie('token', { path: '/' });
         res.json({ message: 'Logout realizado' });
-    }
+    },
+
+    async verify(req: Request, res: Response) {
+        const token = req.cookies?.token;
+
+        try {
+            const result = await authService.verify(token);
+            res.status(200).json(result);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unauthorized";
+            res.status(401).json({ error: message });
+        }
+},
 }

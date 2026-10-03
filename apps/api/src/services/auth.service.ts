@@ -63,5 +63,16 @@ export const authService = {
         if (!passwordIsValid) throw new Error('Invalid password')
 
         await userRepository.delete(id, password)
-    }
+    },
+
+    async verify(token: string | undefined) {
+        if (!token) throw new Error("Token ausente");
+
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+            return { userId: decoded.userId };
+        } catch {
+            throw new Error("Token inválido ou expirado");
+        }
+  },
 }
