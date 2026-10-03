@@ -15,7 +15,7 @@ export async function apiFetch<T = unknown>(
   let res: Response;
 
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(`/api${API_URL}${path}`, {
       ...options,
       credentials: "include",
       headers: { "Content-Type": "application/json", ...options?.headers },
