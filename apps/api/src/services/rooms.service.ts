@@ -40,5 +40,12 @@ export const roomService = {
         if (existingRoom.hostId !== userId) throw new Error("Only the host can delete the room")
 
         return await roomRepository.delete(roomId, userId) 
-    }
+    },
+
+    async listMyRooms(userId: string) {
+        const existingUser = await userRepository.findById(userId)
+        if (!existingUser) throw new Error("User not found")
+            
+        return roomRepository.listForUser(userId);
+    },
 }

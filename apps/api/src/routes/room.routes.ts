@@ -18,5 +18,6 @@ router.post("/rooms/:roomId/enter", roomParticipantsController.enterRoom);
 router.delete("/rooms/:roomId/participants", roomParticipantsController.remove);
 router.delete("/rooms/:roomId/participants/:targetUserId", roomParticipantsController.kick);
 router.get("/rooms/:roomId/participants", roomParticipantsController.listParticipants);
+router.get("/rooms/", roomController.listMyRooms);
 
 export default router;

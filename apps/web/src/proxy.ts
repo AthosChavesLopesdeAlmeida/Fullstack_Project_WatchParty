@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const AUTH_ROUTES = ["/login", "/register", "/"];
+const AUTH_ROUTES = ["/login", "/register"];
 const PROTECTED_ROUTES = ["/main", "/me", "/friends", "/rooms", "/room"];
 
 async function isTokenValid(token: string | undefined): Promise<boolean> {
@@ -22,11 +22,12 @@ export async function proxy(req: NextRequest) {
   const valid = await isTokenValid(token);
   const { pathname } = req.nextUrl;
 
+  const isLandingPage = pathname === "/";
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (valid && isAuthRoute) {
-    return NextResponse.redirect(new URL("/main", req.url));
+  if (valid && (isLandingPage || isAuthRoute)) {
+    return NextResponse.redirect(new URL("/rooms", req.url));
   }
 
   if (!valid && isProtectedRoute) {

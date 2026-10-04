@@ -46,5 +46,16 @@ export const roomController = {
             const message = error instanceof Error ? error.message : 'Unable to delete the room'
             res.status(404).json({ error: message })
         }
-    }
+    },
+
+    async listMyRooms(req: AuthRequest, res: Response) {
+        const userId = req.userId!;
+        try {
+            const rooms = await roomService.listMyRooms(userId);
+            res.status(200).json({ rooms });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unable to list rooms";
+            res.status(400).json({ error: message });
+        }
+    },
 }

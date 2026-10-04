@@ -36,6 +36,8 @@ const Page = () => {
         body: { email, username, password, pfp } 
       });
 
+    setIsloading(false)
+    
     if (!response.ok) {
       if (response.errorType === "network") {
         setError("Unable to connect to the server");
@@ -47,8 +49,7 @@ const Page = () => {
       return;
     }
 
-    setIsloading(false)
-    router.push("/main");
+    router.push("/rooms");
   }
 
   return (
