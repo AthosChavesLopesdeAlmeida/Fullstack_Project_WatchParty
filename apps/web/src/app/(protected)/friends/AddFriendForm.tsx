@@ -17,9 +17,9 @@ import { Input } from "@/components/ui/input"
 
 import { PlusCircleIcon } from '@phosphor-icons/react'
 
-const CreateRoomForm = () => {
+const AddFriendForm = () => {
   const [isFormOpen, setIsFormOpen] = useState(false)  
-  const [roomName, setRoomName] = useState('')
+  const [addresseeEmail, setAddresseeEmail] = useState('')
 
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -31,9 +31,9 @@ const CreateRoomForm = () => {
     setError('')
     setIsLoading(true)
 
-    const response = await apiFetch<{ user: { id: string } }>("/rooms/", {
+    const response = await apiFetch<{ user: { id: string } }>("/friends/", {
         method: "POST",
-        body: { roomName }
+        body: { addresseeEmail }
     })
 
     setIsLoading(false)
@@ -43,33 +43,36 @@ const CreateRoomForm = () => {
         setError("Unable to connect to the server");
         setIsLoading(false)
       } else {
-        setError((response.data as any)?.error ?? "Error creating room");
+        setError((response.data as any)?.error ?? "Error sending request");
         setIsLoading(false)
       }
       return;
     }
 
-    setRoomName("")
+    setAddresseeEmail("")
     router.refresh()
   }
 
   return (
     <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogTrigger className="bg-blue-800 h-10 w-40 text-sm flex flex-row items-center justify-center gap-4 rounded-sm cursor-pointer hover:bg-blue-900 hover:opacity-70">
-            <PlusCircleIcon/> Create Room
+            <PlusCircleIcon/> Add friend
         </DialogTrigger>
 
         <DialogContent className="dark">
             <DialogHeader>
-                <DialogTitle>Create Room</DialogTitle>
-                <DialogDescription>It's easy! To create a room, give it a name and it is done ;&#41;</DialogDescription>
+                <DialogTitle>Add Friend</DialogTitle>
+                <DialogDescription>
+                    It's easy! To send a friendship invitation, 
+                    use the person's email and wait for a reply ;&#41;
+                </DialogDescription>
             </DialogHeader>
 
             <div>
                 <form onSubmit={(e) => handleSubmit(e)} className='flex flex-col gap-4'>
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="roomname">Room name</Label>
-                        <Input min={3} max={60} required id="roomname" name="roomname" onChange={(e) => setRoomName(e.target.value)} type="text"></Input>
+                        <Label htmlFor="email">Email</Label>
+                        <Input required id="email" name="email" onChange={(e) => setAddresseeEmail(e.target.value)} type="email"></Input>
                     </div>
 
                     <div className="flex flex-col gap-3 text-center">
@@ -83,4 +86,4 @@ const CreateRoomForm = () => {
   )
 }
 
-export default CreateRoomForm
+export default AddFriendForm

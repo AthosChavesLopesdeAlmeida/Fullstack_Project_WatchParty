@@ -1,4 +1,3 @@
-// apps/web/src/components/RoomsList.tsx
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
@@ -16,11 +15,11 @@ interface RoomsListProps {
 
 export function RoomsList({ initialRooms }: RoomsListProps) {
   if (initialRooms.length === 0) {
-    return <p className="text-muted-foreground">Você ainda não tem nenhuma sala.</p>;
+    return <p className="text-muted-foreground">You have no rooms to join</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
       {initialRooms.map((room) => (
         <Link key={room.id} href={`/room/${room.id}`}>
           <Card className="hover:opacity-80 cursor-pointer transition-opacity">

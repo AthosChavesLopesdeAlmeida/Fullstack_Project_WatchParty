@@ -21,8 +21,9 @@ export async function apiFetch<T = unknown>(
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: options?.body !== undefined ? JSON.stringify(options.body) : undefined,
     });
-  } catch {
+  } catch (err) {
     // aqui o problema é de REDE — servidor inacessível, sem internet, CORS bloqueando
+    console.error("apiFetch network error:", err)
     return { data: null, status: 0, ok: false, errorType: "network" };
   }
 
