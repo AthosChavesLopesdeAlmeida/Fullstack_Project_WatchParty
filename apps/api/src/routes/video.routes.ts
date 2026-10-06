@@ -9,7 +9,7 @@ router.post('/videos/:videoId/complete', authMiddleware, videosController.comple
 
 router.delete('/videos/:videoId', authMiddleware, videosController.deleteVideo)
 
-router.get('/videos/', authMiddleware, videosController.listMyVideos)
+router.get('/videos', authMiddleware, videosController.listMyVideos)
 router.get('/videos/:videoId', authMiddleware, videosController.getVideo)
 
 export default router

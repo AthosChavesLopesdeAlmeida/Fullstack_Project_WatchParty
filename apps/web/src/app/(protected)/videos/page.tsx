@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 
 import {  
     Card,
@@ -6,9 +7,26 @@ import {
     CardDescription,
     CardContent
 } from '@/components/ui/card'
+
 import UploadVideoForm from './UploadVideoForm'
+import VideosList from './VideosList'
 
 const Page = async () => {
+    async function getVideos(token: string) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/videos`, {
+            headers: { Cookie: `token=${token}` },
+            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.videos ?? data; 
+    }
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    const videos = token ? await getVideos(token) : [];
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">
         <header className='flex flex-row items-center justify-between text-white'>
@@ -35,7 +53,7 @@ const Page = async () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-
+                <VideosList initialVideos={videos}/>
             </CardContent>
         </Card>
     </div>
