@@ -46,7 +46,7 @@ const page = async () => {
                 </CardTitle>
                 <CardDescription className='w-130'>
                     Here you can see all of your friends. 
-                    You send someoene a friendship invitation?
+                    You want to send someoene a friendship invitation?
                     Use the button 'Add friend' and use the person's email to send a invitation!
                 </CardDescription>
             </CardHeader>

@@ -79,5 +79,15 @@ export const authController = {
             const message = error instanceof Error ? error.message : "Unauthorized";
             res.status(401).json({ error: message });
         }
-},
+    },
+
+    async me(req: AuthRequest, res: Response) {
+    try {
+        const user = await authService.getProfile(req.userId!)
+        res.status(200).json({ user })
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to load profile"
+        res.status(404).json({ error: message })
+    }
+    },
 }

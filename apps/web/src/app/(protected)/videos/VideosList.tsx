@@ -61,14 +61,14 @@ export function VideosList({ initialVideos }: VideosListProps) {
             <CardHeader>
               <CardTitle>{video.videoName}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-5">
               <p className="text-sm text-muted-foreground">
                 URL: {video.processedUrl}
               </p>
-            </CardContent>
               <p className="text-xs text-muted-foreground">
                 Created at {new Date(video.createdAt).toLocaleDateString("pt-BR")}
               </p>
+            </CardContent>
             <CardFooter>
               <Button variant="destructive" size="sm" onClick={() => handleRemove(video.id)} disabled={isLoading}>
                 Delete

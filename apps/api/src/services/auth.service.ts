@@ -74,5 +74,19 @@ export const authService = {
         } catch {
             throw new Error("Token inválido ou expirado");
         }
-  },
+    },
+
+    async getProfile(userId: string) {
+    const user = await userRepository.findById(userId)
+    if (!user) throw new Error("User not found")
+
+    // nunca devolva passwordHash
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        pfpUrl: user.pfp, // a coluna no banco se chama "pfp", o tipo do front usa "pfpUrl"
+        createdAt: user.createdAt,
+    }
+    },
 }
