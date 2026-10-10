@@ -58,6 +58,7 @@ const UploadVideoForm = () => {
       const { video, uploadUrl } = createResponse.data;
 
       // 2. upload direto pro R2 — SEM apiFetch, SEM credentials, SEM Content-Type json
+      console.log("create response:", createResponse.data);
       const uploadRes = await fetch(uploadUrl, {
         method: "PUT",
         body: file,
@@ -80,6 +81,7 @@ const UploadVideoForm = () => {
 
 
       setVideoName('')
+      setIsFormOpen(false)
       if (fileInputRef.current) fileInputRef.current.value === ""
 
     } catch {

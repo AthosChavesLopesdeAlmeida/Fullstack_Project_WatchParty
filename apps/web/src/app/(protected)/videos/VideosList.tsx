@@ -58,12 +58,14 @@ export function VideosList({ initialVideos }: VideosListProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
       {initialVideos.map((video) => (
           <Card key={video.id} className="hover:opacity-80 cursor-pointer transition-opacity">
-            <CardHeader>
+            <CardHeader>  
               <CardTitle>{video.videoName}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-5">
               <p className="text-sm text-muted-foreground">
-                URL: {video.processedUrl}
+                  {video.status === "ready" && video.processedUrl
+                  ? `URL: ${video.processedUrl}`
+                  : `Status: ${video.status}`}
               </p>
               <p className="text-xs text-muted-foreground">
                 Created at {new Date(video.createdAt).toLocaleDateString("pt-BR")}

@@ -13,8 +13,8 @@ export const videosController = {
         const data = createVideoSchema.parse(req.body)
 
         try {
-            const video = await videosService.createVideo(userId, data)
-            res.status(201).json({video})
+            const { video, uploadUrl } = await videosService.createVideo(userId, data)
+            res.status(201).json({ video, uploadUrl })
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to create video'
             res.status(400).json({ error: message })

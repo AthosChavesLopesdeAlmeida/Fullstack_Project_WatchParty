@@ -107,22 +107,25 @@ const ProfileActions = () => {
   }
 
   return (
-    <div className="flex flex-col h-[300px] w-[500px] rounded-sm bg-zinc-800 justify-center items-center">
+    <div className="flex flex-col h-[300px] w-[500px] rounded-sm bg-zinc-800 justify-center items-center gap-5">
         {isFetchingUser ? (
             <p>Loading...</p>
         ) : user ? (
             <>
-            <Avatar>
-                <AvatarImage src={user.pfpUrl} />
+            <Avatar className="w-14 h-14">
+                <AvatarImage src={user.pfpUrl}/>
                 <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
             </Avatar>
-            <p>{user.username}</p>
-            <p>{user.email}</p>
-            <p>Member since {new Date(user.createdAt).toLocaleDateString("pt-BR")}</p>
+            <div className="flex flex-row gap-2">
+              <p>{user.username}</p>
+              <p>-</p>
+              <p>{user.email}</p>
+            </div>
+            <p>Account created in {new Date(user.createdAt).toLocaleDateString("pt-BR")}</p>
 
             <div className="flex flex-row gap-4">
-                <Button onClick={() => handleDelete()} variant="destructive" className="w-[50px]" disabled={isLoading}>Delete Account</Button>
-                <Button onClick={() => handleLogout()} variant="outline" className="w-[50px]" disabled={isLoading}>Logout</Button>
+                <Button onClick={() => handleDelete()} variant="destructive" className="cursor-pointer" disabled={isLoading}>Delete Account</Button>
+                <Button onClick={() => handleLogout()} variant="outline" className="cursor-pointer" disabled={isLoading}>Logout</Button>
             </div>
             </>
         ) : null}
