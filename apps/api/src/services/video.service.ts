@@ -1,6 +1,6 @@
 import { videosRepository } from "@watch-party/db";
 import { CreateVideoInput } from "@watch-party/schemas";
-import { deleteObject, generatePresignedUploadUrl } from "../lib/s3";
+import { deleteObject, generatePresignedUploadUrl, generatePresignedReadUrl } from "../lib/s3";
 import { videoQueue } from "@watch-party/queue";
 import { roomParticipantsRepository } from "@watch-party/db";
 
@@ -46,7 +46,12 @@ export const videosService = {
         // ^ método que ainda não existe, porque a tabela rooms/room_participants não existe ainda
 
         if (!isOwner && !isRoomParticipant) throw new Error("No authorization to watch this video");
-        return video;
+        if (video.status !== "ready" || !video.processedUrl) {
+            return { ...video, streamUrl: null };
+        }
+
+        const streamUrl = await generatePresignedReadUrl(extractKeyFromUrl(video.processedUrl));
+        return { ...video, streamUrl };
     },
 
     async listMyVideos (posterId: string) {

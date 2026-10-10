@@ -46,14 +46,15 @@ export const roomParticipantsController = {
     },
 
     async listParticipants (req: AuthRequest<{ roomId: string }>, res: Response) {
-        const { roomId } = req.params
+        const userId = req.userId!;
+        const { roomId } = req.params;
 
         try {
-            const participants = await roomParticipantsService.listParticipants(roomId)
-            res.status(200).json({ participants })
+            const members = await roomParticipantsService.listParticipants(roomId, userId);
+            res.status(200).json({ members });
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unable to list users'
-            res.status(400).json({ error: message })
+            const message = error instanceof Error ? error.message : "Unable to list members";
+            res.status(400).json({ error: message });
         }
     },
 

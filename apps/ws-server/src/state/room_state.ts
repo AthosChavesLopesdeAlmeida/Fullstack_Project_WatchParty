@@ -6,6 +6,7 @@ interface RoomState {
   hostId: string;
   isPlaying: boolean;
   position: number; // segundos do vídeo
+  updatedAt: number; // timestamp (ms) da última atualização
 }
 
 export async function getRoomState(roomId: string): Promise<RoomState | null> {

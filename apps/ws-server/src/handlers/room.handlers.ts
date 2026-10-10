@@ -8,7 +8,7 @@ import {
 } from "../connections";
 import { getRoomState, setRoomState } from "../state/room_state";
 import { handlePlaybackEvent } from "./playback.handlers";
-import { roomRepository } from "@watch-party/db";
+import { roomRepository, roomParticipantsRepository } from "@watch-party/db";
 
 export async function handleMessage(socket: WebSocket, userId: string, message: any) {
   switch (message.type) {
@@ -28,39 +28,40 @@ export async function handleMessage(socket: WebSocket, userId: string, message: 
 }
 
 async function handleJoinRoom(socket: WebSocket, userId: string, roomId: string) {
+  // a sala é buscada sempre, não só quando o Redis está vazio
+  const room = await roomRepository.findById(roomId);
+  if (!room) {
+    socket.send(JSON.stringify({ type: "error", message: "Room not found" }));
+    return;
+  }
+
+  // a comparação com room.hostId cobre salas criadas antes do item 3
+  const allowed =
+    room.hostId === userId || (await roomParticipantsRepository.isAcceptedParticipant(userId, roomId));
+  if (!allowed) {
+    socket.send(JSON.stringify({ type: "error", message: "Not allowed to enter this room" }));
+    return;
+  }
+
   let state = await getRoomState(roomId);
-
-  // primeira pessoa a entrar na sala (ou Redis foi limpo/reiniciado) — inicializa o estado
   if (!state) {
-    const room = await roomRepository.findById(roomId);
-    if (!room) {
-      socket.send(JSON.stringify({ type: "error", message: "Room not found" }));
-      return;
-    }
-
-    state = {
-      hostId: room.hostId,
-      isPlaying: false,
-      position: 0,
-    };
+    state = { hostId: room.hostId, isPlaying: false, position: 0, updatedAt: Date.now() };
     await setRoomState(roomId, state);
   }
 
+  const elapsed = (Date.now() - (state.updatedAt ?? Date.now())) / 1000; // o ?? cobre estados antigos do Redis
+  const livePosition = state.isPlaying ? state.position + elapsed : state.position;
+
   joinRoom(roomId, socket, userId);
-
-  // avisa a sala que alguém entrou
   broadcastToRoom(roomId, { type: "user-joined", userId }, socket);
-
-  // estado da sala + lista de quem já está presente, pro recém-chegado se situar
   socket.send(
     JSON.stringify({
       type: "room-state",
-      state,
+      state: { ...state, position: livePosition },
       participants: getRoomParticipants(roomId),
     })
   );
 }
-
 // chamado quando um socket desconecta (a partir do server.ts)
 export async function handleDisconnect(socket: WebSocket) {
   const meta = leaveRoom(socket);
@@ -78,8 +79,8 @@ export async function handleDisconnect(socket: WebSocket) {
     const newHostId = pickRandomParticipant(roomId, userId);
 
     if (newHostId) {
-      const updatedState = { ...state, hostId: newHostId };
-      await setRoomState(roomId, updatedState);
+      await roomRepository.setHost(roomId, newHostId);
+      await setRoomState(roomId, { ...state, hostId: newHostId });
       broadcastToRoom(roomId, { type: "host-changed", newHostId });
     }
     // se newHostId for null, a sala ficou vazia — nada a fazer,

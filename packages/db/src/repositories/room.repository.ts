@@ -2,15 +2,19 @@ import { eq, and, inArray } from "drizzle-orm";
 import { db } from "../client";
 import { rooms } from "../schema";
 import { roomParticipants } from "../schema";
+import { randomUUID } from "node:crypto";
 
 export const roomRepository = {
     async create (roomName: string, userId: string) {
-        const [room]  = await db.insert(rooms).values({
-            hostId: userId,
-            roomName: roomName
-        }) .returning()
+        const roomId = randomUUID();
 
-        return room
+        // Em uma operação atômica, cria a sala e assinala o host como participante
+        const [insertedRooms] = await db.batch([
+            db.insert(rooms).values({ id: roomId, hostId: userId, roomName }).returning(),
+            db.insert(roomParticipants).values({ userId, roomId, invitationStatus: "accepted" }),
+        ]);
+
+        return insertedRooms[0];
     },
 
     async setVideo (roomId: string, videoId: string) {
@@ -51,5 +55,9 @@ export const roomRepository = {
         const uniqueRooms = Array.from(new Map(allRooms.map((r) => [r.id, r])).values());
 
         return uniqueRooms;
-    }
+    },
+
+    async setHost(roomId: string, newHostId: string) {
+        await db.update(rooms).set({ hostId: newHostId }).where(eq(rooms.id, roomId));
+    },
 }

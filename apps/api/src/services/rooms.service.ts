@@ -48,4 +48,8 @@ export const roomService = {
             
         return roomRepository.listForUser(userId);
     },
+
+    async findById(roomId: string) {
+        return roomRepository.findById(roomId)
+    }
 }

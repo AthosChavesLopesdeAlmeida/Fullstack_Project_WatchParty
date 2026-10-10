@@ -42,11 +42,16 @@ export const roomParticipantsService = {
         await roomParticipantsRepository.remove(targetUserId, roomId);
     },
     
-    async listParticipants (roomId: string) {
-        const existingRoom = await roomRepository.findById(roomId)
-        if (!existingRoom) throw new Error("Room not found") 
+    async listParticipants (roomId: string, requesterId: string) {
+        const room = await roomRepository.findById(roomId);
+        if (!room) throw new Error("Room not found");
 
-        const participants = await roomParticipantsRepository.listParticipants(roomId)
-        return participants
+        const members = await roomParticipantsRepository.listParticipants(roomId);
+
+        // Verifica se o usuário faz parte da sala
+        const isMember = room.hostId === requesterId || members.some((m) => m.userId === requesterId);
+        if (!isMember) throw new Error("You are not a member of this room");
+
+        return members.map((m) => ({ ...m, isHost: m.userId === room.hostId }));
     }
 }

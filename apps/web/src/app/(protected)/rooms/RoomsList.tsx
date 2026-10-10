@@ -21,7 +21,7 @@ export function RoomsList({ initialRooms }: RoomsListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
       {initialRooms.map((room) => (
-        <Link key={room.id} href={`/room/${room.id}`}>
+        <Link key={room.id} href={`/rooms/${room.id}`}>
           <Card className="hover:opacity-80 cursor-pointer transition-opacity">
             <CardHeader>
               <CardTitle>{room.roomName}</CardTitle>

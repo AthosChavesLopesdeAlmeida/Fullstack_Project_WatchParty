@@ -58,4 +58,16 @@ export const roomController = {
             res.status(400).json({ error: message });
         }
     },
+
+    async findById (req: AuthRequest<{ roomId: string }>, res: Response) {
+        const { roomId } = req.params;    
+
+        try {
+            const rooms = await roomService.findById(roomId);
+            res.status(200).json({ rooms });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unable to list rooms";
+            res.status(400).json({ error: message });
+        }
+    }
 }

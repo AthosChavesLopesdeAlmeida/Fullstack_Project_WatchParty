@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../client";
-import { roomParticipants } from "../schema";
+import { users, roomParticipants } from "../schema";
 import { rooms } from "../schema";
 
 export const roomParticipantsRepository = {
@@ -24,7 +24,21 @@ export const roomParticipantsRepository = {
     },
 
     async listParticipants (roomId: string) {
-        return await db.query.roomParticipants.findMany({ where: eq(roomParticipants.roomId, roomId) })
+        // Faz um join dos participantes com a tabela de usuários, se forem usuário aceitos na sala
+        return db
+            .select({
+            userId: users.id,
+            username: users.username,
+            pfpUrl: users.pfp, // mesmo mapeamento do /auth/me
+            })
+            .from(roomParticipants)
+            .innerJoin(users, eq(roomParticipants.userId, users.id))
+            .where(
+            and(
+                eq(roomParticipants.roomId, roomId),
+                eq(roomParticipants.invitationStatus, "accepted"),
+            ),
+            );
     },
     
     async listRoomsByUser (userId: string) {
@@ -55,5 +69,22 @@ export const roomParticipantsRepository = {
         .limit(1);
 
         return result.length > 0;
+    },
+
+    // Verifica se o usuário é um participante da sala e está aceito
+    async isAcceptedParticipant(userId: string, roomId: string): Promise<boolean> {
+    const result = await db
+        .select({ userId: roomParticipants.userId })
+        .from(roomParticipants)
+        .where(
+        and(
+            eq(roomParticipants.userId, userId),
+            eq(roomParticipants.roomId, roomId),
+            eq(roomParticipants.invitationStatus, "accepted"),
+        ),
+        )
+        .limit(1);
+
+    return result.length > 0;
     },
 };

@@ -31,6 +31,7 @@ export async function handlePlaybackEvent(
     ...state,
     isPlaying: type === "play" ? true : type === "pause" ? false : state.isPlaying,
     position,
+    updatedAt: Date.now(),
   };
 
   await setRoomState(roomId, updatedState);
