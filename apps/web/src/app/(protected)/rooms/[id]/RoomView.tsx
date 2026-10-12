@@ -8,7 +8,6 @@ import ParticipantsSidebar, { type  RoomMember }  from "./ParticipantsSidebar";
 
 interface RoomViewProps {
   roomId: string;
-  roomName: string;
   initialHostId: string;
   currentUserId: string;
   members: RoomMember[];
@@ -18,7 +17,6 @@ interface RoomViewProps {
 
 export function RoomView({
   roomId,
-  roomName,
   initialHostId,
   currentUserId,
   members,
@@ -58,7 +56,6 @@ export function RoomView({
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{roomName}</h1>
         {isHost && <span className="text-xs text-amber-400">You are the host</span>}
       </header>
 
