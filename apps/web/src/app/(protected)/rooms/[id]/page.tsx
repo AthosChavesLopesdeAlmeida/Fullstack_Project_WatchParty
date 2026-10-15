@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { serverFetch } from "@/lib/server-api";
 import { RoomView } from "./RoomView";
 import { RoomMember } from "./ParticipantsSidebar";
+import { Button } from "@/components/ui/button";
+
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -15,7 +17,7 @@ type Room = {
 
 // Este componente é o que envelopa todo o RoomView
 // Tem um cabeçalho com os links, como todas as outra páginas
-function Shell({ title, children }: { title?: string; children: ReactNode }) {
+function Shell({ id, title, children }: { id?: string, title?: string; children: ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">
       <header className="flex flex-row items-center justify-between text-white">
@@ -30,8 +32,11 @@ function Shell({ title, children }: { title?: string; children: ReactNode }) {
       </header>
 
       <Card className="dark flex-1 rounded-sm">
-        <CardHeader>
+        <CardHeader className="flex flex-row justify-between">
           <CardTitle className="text-3xl flex flex-row justify-between">{title}</CardTitle>
+          <Button className="bg-blue-800 h-10 w-40 text-sm text-white flex flex-row items-center justify-center gap-4 rounded-sm cursor-pointer hover:bg-blue-900 hover:opacity-70">
+            <a href={`/rooms/${id}/configs`}>Configurations</a>
+          </Button>
         </CardHeader>
         <CardContent>{children}</CardContent>
       </Card>
@@ -53,7 +58,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!meRes.data || !roomRes.data?.room) {
     return (
-      <Shell>
+      <Shell >
         <p className="text-red-500">{roomRes.error ?? meRes.error ?? "Room not found"}</p>
       </Shell>
     );
@@ -64,7 +69,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
   // o endpoint de membros é quem confere se o usuário pertence à sala
   if (!membersRes.data) {
     return (
-      <Shell title={room.roomName}>
+      <Shell title={room.roomName} id={room.id}>
         <p className="text-red-500">
           {membersRes.error ?? "You don't have access to this room"}
         </p>
@@ -82,7 +87,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
   }
 
   return (
-    <Shell title={room.roomName}>
+    <Shell title={room.roomName} id={room.id}>
       <RoomView
         roomId={room.id}
         initialHostId={room.hostId}
