@@ -1,7 +1,7 @@
 import { videosRepository } from "@watch-party/db";
 import { CreateVideoInput } from "@watch-party/schemas";
 import { deleteObject, generatePresignedUploadUrl, generatePresignedReadUrl } from "../lib/s3";
-import { videoQueue } from "@watch-party/queue";
+import { videoQueue, processedKeyFor } from "@watch-party/queue";
 import { roomParticipantsRepository } from "@watch-party/db";
 
 function extractKeyFromUrl(url: string): string {
@@ -46,11 +46,11 @@ export const videosService = {
         // ^ método que ainda não existe, porque a tabela rooms/room_participants não existe ainda
 
         if (!isOwner && !isRoomParticipant) throw new Error("No authorization to watch this video");
-        if (video.status !== "ready" || !video.processedUrl) {
+        if (video.status !== "ready") {
             return { ...video, streamUrl: null };
         }
 
-        const streamUrl = await generatePresignedReadUrl(extractKeyFromUrl(video.processedUrl));
+        const streamUrl = await generatePresignedReadUrl(processedKeyFor(video.rawKey));
         return { ...video, streamUrl };
     },
 
@@ -65,10 +65,13 @@ export const videosService = {
 
         if (video.posterId !== posterId) throw new Error("Unauthorized")
 
-        // apaga o arquivo bruto (sempre existe) (ainda não implementado)
+        // apaga o arquivo bruto (sempre existe) 
         await deleteObject(video.rawKey);
+        if (video.status === "ready") {
+        await deleteObject(processedKeyFor(video.rawKey));
+        }
 
-        // apaga o processado também, se já tiver sido gerado (ainda não implementado)
+        // apaga o processado também, se já tiver sido gerado
         if (video.processedUrl) {
             const processedKey = extractKeyFromUrl(video.processedUrl);
             await deleteObject(processedKey);

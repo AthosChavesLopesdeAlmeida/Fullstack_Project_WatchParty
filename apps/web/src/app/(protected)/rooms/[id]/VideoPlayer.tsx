@@ -85,7 +85,7 @@ const VideoPlayer = ({
         controls={isHost}
         playsInline
         preload="metadata"
-        className="aspect-video w-full bg-black"
+        className="aspect-video w-full bg-black rounded-sm"
         onLoadedMetadata={() => setMetadataReady(true)}
         onPlay={() => isHost && sendPlayback("play", currentTime())}
         onPause={() => isHost && sendPlayback("pause", currentTime())}

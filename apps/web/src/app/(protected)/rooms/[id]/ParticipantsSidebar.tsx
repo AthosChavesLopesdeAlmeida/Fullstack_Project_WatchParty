@@ -33,7 +33,7 @@ const ParticipantsSidebar = ({
   });
 
   return (
-    <aside className="w-64 shrink-0 bg-zinc-800 p-4 flex flex-col gap-3 overflow-y-auto">
+    <aside className="w-64 shrink-0 bg-zinc-800 p-4 flex flex-col gap-3 overflow-y-auto rounded-sm">
       <h2 className="text-sm font-semibold">
         Participants ({onlineCount}/{members.length} online)
       </h2>

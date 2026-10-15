@@ -7,7 +7,7 @@ export const rooms = pgTable("rooms", {
     id: uuid("id").primaryKey().defaultRandom(),
     hostId: uuid("host_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     roomName: varchar("room_name", {length: 50}).notNull(),
-    currentVideoId: uuid("current_video_id").references(() => videos.id),
+    currentVideoId: uuid("current_video_id").references(() => videos.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").notNull().defaultNow() 
 })
 

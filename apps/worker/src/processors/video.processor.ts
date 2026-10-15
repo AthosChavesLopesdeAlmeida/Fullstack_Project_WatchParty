@@ -3,7 +3,7 @@ import ffmpeg from "fluent-ffmpeg";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { VIDEO_QUEUE_NAME, VideoJobData, createRedisConnection } from "@watch-party/queue";
+import { VIDEO_QUEUE_NAME, VideoJobData, createRedisConnection, processedKeyFor } from "@watch-party/queue";
 import { videosRepository } from "@watch-party/db";
 import { downloadObject, uploadObject } from "../lib/s3";
 
@@ -34,7 +34,7 @@ export const videoWorker = new Worker<VideoJobData>(
             });
 
             // 3. sobe o resultado processado pro R2
-            const processedKey = `${rawKey}-processed.mp4`;
+            const processedKey = processedKeyFor(rawKey);
             const processedUrl = await uploadObject(processedKey, fs.readFileSync(tempOutput));
 
             // 4. Atualiza o banco diretamente pelo videosRepository
@@ -50,6 +50,7 @@ export const videoWorker = new Worker<VideoJobData>(
     },
     { connection: createRedisConnection() }
 )
+
 
 videoWorker.on("completed", (job) => console.log(`Video ${job.data.videoId} processed`))
 videoWorker.on("failed", (job, err) => console.error(`Video ${job?.data.videoId} failed`))
