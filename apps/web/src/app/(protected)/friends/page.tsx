@@ -35,6 +35,7 @@ const page = async () => {
                 <a href="/friends" className='border-b-1 hover:border-b-2 transition-all duration-300'>Friends</a>
                 <a href="/videos" className='opacity-40 hover:opacity-100 transition-all duration-300'>Videos</a>
                 <a href="/profile" className='opacity-40 hover:opacity-100 transition-all duration-300'>Profile</a>
+                <a href="/inbox" className='opacity-40 hover:opacity-100 transition-all duration-300'>Inbox</a>
             </div>
         </header>
 
