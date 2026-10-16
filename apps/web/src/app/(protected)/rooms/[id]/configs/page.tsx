@@ -88,7 +88,13 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <Shell title={room.roomName} id={room.id}>
-        <ConfigControls></ConfigControls> 
+      <ConfigControls
+        roomId={room.id}
+        hostId={room.hostId}
+        currentUserId={meRes.data.user.id}
+        currentVideoId={room.currentVideoId}
+        members={membersRes.data.members}
+      />
     </Shell>
   );
 };
