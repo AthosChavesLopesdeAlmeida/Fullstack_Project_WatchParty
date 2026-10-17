@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 
 import {  
     Card,
@@ -6,7 +7,37 @@ import {
     CardDescription,
     CardContent
 } from '@/components/ui/card'
+
+import InboxList from "./InboxList";
+
+
 const Page = async () => {
+    async function getFriendInvitations(token: string) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends/pending`, {
+            headers: { Cookie: `token=${token}` },
+            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.pendingRequests ?? data; 
+    }
+
+    async function getRoomInvitations(token: string) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/invites`, {
+            headers: { Cookie: `token=${token}` },
+            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.invites ?? data; 
+    }
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    const friendhipInvites = token ? await getFriendInvitations(token) : [];
+    const roomInvites = token ? await getRoomInvitations(token) : [];
+
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">
@@ -34,6 +65,7 @@ const Page = async () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
+                <InboxList FriendshipInvitations={friendhipInvites} RoomInvitations={roomInvites}/>
             </CardContent>
         </Card>
     </div>

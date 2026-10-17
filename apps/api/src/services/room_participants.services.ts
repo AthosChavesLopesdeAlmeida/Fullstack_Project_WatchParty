@@ -25,6 +25,7 @@ export const roomParticipantsService = {
         if (!existingRoom) throw new Error("Room not found")
 
         const participant = await roomParticipantsRepository.enterRoom(invitedId, roomId)
+        if (!participant) throw new Error("Invitation not found");
         return participant     
     },
 
@@ -53,5 +54,9 @@ export const roomParticipantsService = {
         if (!isMember) throw new Error("You are not a member of this room");
 
         return members.map((m) => ({ ...m, isHost: m.userId === room.hostId }));
-    }
+    },
+
+    async listPendingInvites(userId: string) {
+        return roomParticipantsRepository.listPendingInvites(userId);
+    },
 }

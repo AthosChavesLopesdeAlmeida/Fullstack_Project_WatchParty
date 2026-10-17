@@ -39,10 +39,21 @@ export const friendshipRepository = {
     },
 
     // Lista as pendentes de determinado destinatário
-    async listPendingReceived (userId: string) {
-        return db.query.friendships.findMany({
-            where: and(eq(friendships.addresseeId, userId), eq(friendships.status, 'pending'))
+    async listPendingReceived(userId: string) {
+    return db
+        .select({
+        friendshipId: friendships.id,
+        createdAt: friendships.createdAt,
+        requesterUsername: users.username,
         })
+        .from(friendships)
+        .innerJoin(users, eq(friendships.requesterId, users.id))
+        .where(
+        and(
+            eq(friendships.addresseeId, userId),
+            eq(friendships.status, "pending"),
+        ),
+        );
     },
 
     // Precisa do ID da amizade e do ID de algum dos dois (userId, no caso)

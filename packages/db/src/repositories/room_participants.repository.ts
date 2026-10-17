@@ -1,7 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../client";
-import { users, roomParticipants } from "../schema";
-import { rooms } from "../schema";
+import { users, roomParticipants,rooms } from "../schema";
 
 export const roomParticipantsRepository = {
     async invite (invitedId: string, roomId: string) {
@@ -86,5 +85,25 @@ export const roomParticipantsRepository = {
         .limit(1);
 
     return result.length > 0;
+    },
+
+    async listPendingInvites(userId: string) {
+    return db
+        .select({
+        roomId: rooms.id,
+        roomName: rooms.roomName,
+        hostId: rooms.hostId,
+        hostUsername: users.username,
+        hostPfpUrl: users.pfp, // mesmo mapeamento do /auth/me e do /members
+        })
+        .from(roomParticipants)
+        .innerJoin(rooms, eq(roomParticipants.roomId, rooms.id))
+        .innerJoin(users, eq(rooms.hostId, users.id))
+        .where(
+        and(
+            eq(roomParticipants.userId, userId),
+            eq(roomParticipants.invitationStatus, "pending"),
+        ),
+        );
     },
 };

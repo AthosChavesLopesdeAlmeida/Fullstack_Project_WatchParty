@@ -7,13 +7,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 
 interface Video {
-    id: string;
-    createdAt: Date;
-    status: "pending" | "processing" | "ready" | "failed";
-    posterId: string;
-    videoName: string;
-    rawKey: string;
-    processedUrl: string | null;
+  id: string;
+  createdAt: Date;
+  status: "pending" | "processing" | "ready" | "failed";
+  posterId: string;
+  videoName: string;
+  rawKey: string;
+  processedUrl: string | null;
 }
 
 interface VideosListProps {

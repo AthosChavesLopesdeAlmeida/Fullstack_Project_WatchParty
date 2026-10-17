@@ -70,4 +70,16 @@ export const roomParticipantsController = {
             res.status(400).json({ error: message });
         }
     },
+
+    async listPendingInvites(req: AuthRequest, res: Response) {
+        const userId = req.userId!;
+
+        try {
+            const invites = await roomParticipantsService.listPendingInvites(userId);
+            res.status(200).json({ invites });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unable to list invites";
+            res.status(400).json({ error: message });
+        }
+    },
 }
