@@ -3,8 +3,8 @@ import { roomParticipantsRepository } from "@watch-party/db";
 import { userRepository } from "@watch-party/db";
 
 export const roomParticipantsService = {
-    async invite(hostRequestId: string, invitedId: string, roomId: string) {
-        const existingUser = await userRepository.findById(invitedId);
+    async invite(hostRequestId: string, invitedEmail: string, roomId: string) {
+        const existingUser = await userRepository.findByEmail(invitedEmail);
         if (!existingUser) throw new Error("User not found");
 
         const existingRoom = await roomRepository.findById(roomId);
@@ -14,7 +14,7 @@ export const roomParticipantsService = {
             throw new Error("Only the host can invite participants");
         }
 
-        return roomParticipantsRepository.invite(invitedId, roomId);
+        return roomParticipantsRepository.invite(existingUser.id, roomId);
     },
 
     async enterRoom (invitedId: string, roomId: string) {

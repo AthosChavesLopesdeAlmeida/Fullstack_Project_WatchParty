@@ -1,8 +1,9 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Crown, LogOut, Trash2, UserMinus, Video, AlertTriangle } from "lucide-react"
+import { Crown, LogOut, Trash2, UserMinus, Video, AlertTriangle, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { apiFetch } from "@/lib/api"
 import type { RoomMember } from "../ParticipantsSidebar"
 
@@ -74,6 +75,7 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
 
   const [participants, setParticipants] = useState(members)
   const [videos, setVideos] = useState<Video[]>([])
+  const [invitedEmail, setInvitedEmail] = useState('')
   const [videosLoaded, setVideosLoaded] = useState(false)
   const [videoId, setVideoId] = useState(currentVideoId ?? "")
   const [error, setError] = useState<string | null>(null)
@@ -116,6 +118,16 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
     router.push("/rooms")
   }
 
+  const inviteUser = async (invitedEmail: string) => {
+    const res = await apiFetch(`/rooms/${roomId}/invite`, {
+      method: "POST",
+      body: { invitedEmail },
+    })
+    if (!res.ok) return setError(getErrorMessage(res))
+    setError(null)
+    router.refresh()
+  }
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl text-white">
       {error && (
@@ -126,7 +138,7 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
       )}
 
       <div className={`grid gap-6 items-start ${isHost ? "lg:grid-cols-2" : "grid-cols-1"}`}>
-        {/* Participantes */}
+        {/* Participants */}
         <Panel
           title={`Participants (${participants.length})`}
           description={isHost ? "You can remove people from the room." : "People watching with you."}
@@ -204,6 +216,17 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
             </Panel>
 
             <Panel
+              title="Invite others"
+              description="Invite other users to the room using their email"
+              icon={<Mail size={20} />}
+            >
+              <Input placeholder="example@email.com" type="email" required onChange={(e) => setInvitedEmail(e.target.value)}/>
+              <Button className="bg-blue-800 hover:bg-blue-800 hover:opacity-70 text-white cursor-pointer w-full" onClick={() => inviteUser(invitedEmail)}>
+                Invite user
+              </Button>
+            </Panel>
+
+            <Panel
               danger
               title="Danger zone"
               description="Deleting the room removes it for everyone. This cannot be undone."
@@ -213,6 +236,7 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
                 Delete room
               </Button>
             </Panel>
+
           </div>
         )}
       </div>

@@ -8,10 +8,11 @@ export interface AuthRequest<P = {}> extends Request<P> {
 export const roomParticipantsController = {
     async invite (req: AuthRequest<{ roomId: string, invitedId: string }>, res: Response) {
         const userId = req.userId!
-        const { roomId, invitedId } = req.params
+        const { roomId } = req.params
+        const { invitedEmail } = req.body
 
         try {
-            const invitation = await roomParticipantsService.invite(userId, invitedId, roomId)
+            const invitation = await roomParticipantsService.invite(userId, invitedEmail, roomId)
             res.status(201).json({ invitation })
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to invite user'

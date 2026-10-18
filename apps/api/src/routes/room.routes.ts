@@ -18,7 +18,7 @@ router.get("/rooms/invites", roomParticipantsController.listPendingInvites);
 router.get("/rooms/:roomId", roomController.findById)
 
 // Room participants
-router.post("/rooms/:roomId/invite/:invitedId", roomParticipantsController.invite);
+router.post("/rooms/:roomId/invite", roomParticipantsController.invite);
 router.post("/rooms/:roomId/enter", roomParticipantsController.enterRoom);
 
 router.delete("/rooms/:roomId/participants", roomParticipantsController.remove);
