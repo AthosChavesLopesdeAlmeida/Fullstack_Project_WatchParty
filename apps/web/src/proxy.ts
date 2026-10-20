@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const AUTH_ROUTES = ["/login", "/register"];
-const PROTECTED_ROUTES = ["/main", "/me", "/friends", "/rooms", "/room"];
+const PROTECTED_ROUTES = ["/main", "/profile", "/friends", "/rooms", "/room", "/inbox", "/videos"];
 
 async function isTokenValid(token: string | undefined): Promise<boolean> {
   if (!token) return false;

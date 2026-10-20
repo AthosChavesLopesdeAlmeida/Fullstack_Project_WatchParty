@@ -50,6 +50,7 @@ const AddFriendForm = () => {
     }
 
     setAddresseeEmail("")
+    setIsFormOpen(false)
     router.refresh()
   }
 

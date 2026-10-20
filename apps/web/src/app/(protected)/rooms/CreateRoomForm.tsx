@@ -50,6 +50,7 @@ const CreateRoomForm = () => {
     }
 
     setRoomName("")
+    setIsFormOpen(false)
     router.refresh()
   }
 

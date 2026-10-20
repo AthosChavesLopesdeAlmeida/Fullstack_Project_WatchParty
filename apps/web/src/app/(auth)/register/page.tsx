@@ -54,7 +54,7 @@ const Page = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-800">
-      <Card className="dark h-[530px] w-[400px] rounded-sm">
+      <Card className="dark w-[400px] rounded-sm">
         
         <CardHeader>
           <CardTitle className="text-2xl">Create account</CardTitle>

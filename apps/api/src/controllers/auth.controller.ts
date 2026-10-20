@@ -7,6 +7,8 @@ export interface AuthRequest extends Request {
   userId?: string;
 }
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 export const authController = {
     async register (req: Request, res: Response) {
         const data = registerSchema.parse(req.body)
@@ -51,14 +53,13 @@ export const authController = {
     },
 
     async delete (req: AuthRequest, res: Response) {
-        const data = deleteSchema.parse(req.body)
         const userId = req.userId! 
 
         try {
-            await authService.delete(userId, data)
-
-            res.clearCookie('token', { path: '/' })
-            res.status(204).send()
+            const { password } = deleteSchema.parse(req.body);
+            await authService.delete(userId, { password });
+            res.clearCookie("token", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax", path: "/" });
+            res.status(200).json({ ok: true });
         } catch {
             res.status(401).json({ error: 'User not found' })
         }

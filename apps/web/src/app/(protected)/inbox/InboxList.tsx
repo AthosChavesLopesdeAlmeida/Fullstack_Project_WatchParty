@@ -1,178 +1,151 @@
-"use client"
+"use client";
+
 import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-interface RoomInvitation {
-  id: string, 
-  roomName: string,
-  hostUsername: string
-}
+// GET /friends/pending -> { pendingRequests: FriendshipInvite[] }
+type FriendshipInvite = {
+  friendshipId: string;
+  requesterUsername: string;
+  createdAt?: string;
+};
 
-interface FriendshipInvitation {
-  id: string,
-  senderName: string,
-  sentAt: Date
+// GET /rooms/invites -> { invites: RoomInvitation[] }
+interface RoomInvitation {
+  roomId: string;
+  roomName: string;
+  hostUsername: string;
 }
 
 interface InboxProps {
-  FriendshipInvitations: FriendshipInvitation[],
-  RoomInvitations: RoomInvitation[]
+  FriendshipInvitations: FriendshipInvite[];
+  RoomInvitations: RoomInvitation[];
+}
+
+function formatDate(value?: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("pt-BR");
 }
 
 const InboxList = ({ FriendshipInvitations, RoomInvitations }: InboxProps) => {
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  // local copies, so a card can disappear as soon as the action succeeds
+  const [friendInvites, setFriendInvites] = useState(FriendshipInvitations);
+  const [roomInvites, setRoomInvites] = useState(RoomInvitations);
+  const [error, setError] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-  const rejectFriend = async (id: string) => {
-    setError('')
-    setIsLoading(true)
+  const runAction = async (
+    id: string,
+    path: string,
+    method: "POST" | "DELETE",
+    fallbackError: string,
+    onSuccess: () => void,
+  ) => {
+    setError("");
+    setBusyId(id);
 
-    const response = await apiFetch(`/friends/${id}/reject`, { 
-        method: "POST"
-    });
+    const response = await apiFetch(path, { method });
 
-    setIsLoading(false)
-    
+    setBusyId(null);
+
     if (!response.ok) {
-      if (response.errorType === "network") {
-        setError("Unable to connect to the server");
-        setIsLoading(false)
-      } else {
-        setError((response.data as any)?.error ?? "Error rejecting friendship request");
-        setIsLoading(false)
-      }
+      setError(
+        response.errorType === "network"
+          ? "Unable to connect to the server"
+          : ((response.data as { error?: string } | null)?.error ?? fallbackError),
+      );
       return;
     }
-  }
 
-  const acceptFriend  = async (id: string) => {
-    setError('')
-    setIsLoading(true)
+    onSuccess();
+  };
 
-    const response = await apiFetch(`/friends/${id}/accept`, { 
-        method: "POST"
-    });
+  const removeFriendInvite = (id: string) =>
+    setFriendInvites((prev) => prev.filter((invite) => invite.friendshipId !== id));
 
-    setIsLoading(false)
-    
-    if (!response.ok) {
-      if (response.errorType === "network") {
-        setError("Unable to connect to the server");
-        setIsLoading(false)
-      } else {
-        setError((response.data as any)?.error ?? "Error rejecting friendship request");
-        setIsLoading(false)
-      }
-      return;
-    }
-  }
+  const removeRoomInvite = (id: string) =>
+    setRoomInvites((prev) => prev.filter((invite) => invite.roomId !== id));
 
-  const rejectRoomIvitation = async (id: string) => {
-    setError('')
-    setIsLoading(true)
+  const acceptFriend = (id: string) =>
+    runAction(id, `/friends/${id}/accept`, "POST", "Error accepting friendship request", () => removeFriendInvite(id));
 
-    const response = await apiFetch(`/rooms/${id}/participants`, { 
-      method: "DELETE"
-    });
+  const rejectFriend = (id: string) =>
+    runAction(id, `/friends/${id}/reject`, "POST", "Error rejecting friendship request", () => removeFriendInvite(id));
 
-    setIsLoading(false)
-    
-    if (!response.ok) {
-      if (response.errorType === "network") {
-        setError("Unable to connect to the server");
-        setIsLoading(false)
-      } else {
-        setError((response.data as any)?.error ?? "Error rejecting room invitation");
-        setIsLoading(false)
-      }
-      return;
-    }   
-  }
+  const acceptRoomInvitation = (id: string) =>
+    runAction(id, `/rooms/${id}/enter`, "POST", "Error accepting room invitation", () => removeRoomInvite(id));
 
-  const acceptRoomInvitation = async (id: string) => {
-    setError('')
-    setIsLoading(true)
+  // declining a room invitation is the same endpoint used to leave a room
+  const rejectRoomInvitation = (id: string) =>
+    runAction(id, `/rooms/${id}/participants`, "DELETE", "Error rejecting room invitation", () => removeRoomInvite(id));
 
-    const response = await apiFetch(`/rooms/${id}/enter`, { 
-      method: "POST"
-    });
-
-    setIsLoading(false)
-    
-    if (!response.ok) {
-      if (response.errorType === "network") {
-        setError("Unable to connect to the server");
-        setIsLoading(false)
-      } else {
-        setError((response.data as any)?.error ?? "Error accepting room invitation");
-        setIsLoading(false)
-      }
-      return;
-    }     
-  }
-
-  if (FriendshipInvitations.length === 0 && RoomInvitations.length === 0) {
+  if (friendInvites.length === 0 && roomInvites.length === 0) {
     return <p className="text-muted-foreground">Your inbox is empty</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
-      {FriendshipInvitations.map((fi) => (
-          <Card key={fi.id} className="hover:opacity-80 cursor-pointer transition-opacity">
-            <CardHeader>  
-              <CardTitle>{fi.senderName}</CardTitle>
+    <div className="flex flex-col gap-4 pt-6">
+      {error && <p className="font-bold text-red-500">{error}</p>}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {friendInvites.map((invite) => {
+          const sentAt = formatDate(invite.createdAt);
+
+          return (
+            <Card key={invite.friendshipId}>
+              <CardHeader>
+                <CardTitle>{invite.requesterUsername}</CardTitle>
+              </CardHeader>
+
+              <CardContent className="flex flex-col gap-1">
+                <p className="text-xs text-muted-foreground">Friend request</p>
+                {sentAt && (
+                  <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                    Sent at {sentAt}
+                  </p>
+                )}
+              </CardContent>
+
+              <CardFooter className="gap-2">
+                <Button variant="destructive" size="sm" onClick={() => rejectFriend(invite.friendshipId)} disabled={busyId === invite.friendshipId}>
+                  Reject
+                </Button>
+                <Button className="bg-green-600 text-white hover:bg-green-700" size="sm" onClick={() => acceptFriend(invite.friendshipId)} disabled={busyId === invite.friendshipId}>
+                  Accept
+                </Button>
+              </CardFooter>
+            </Card>
+          );
+        })}
+
+        {roomInvites.map((invite) => (
+          <Card key={invite.roomId}>
+            <CardHeader>
+              <CardTitle>{invite.roomName}</CardTitle>
             </CardHeader>
 
-            <CardContent className="flex flex-col gap-5">
-              <p className="text-xs text-muted-foreground">
-                Sent at {new Date(fi.sentAt).toLocaleDateString("pt-BR")}
-              </p>
+            <CardContent className="flex flex-col gap-1">
+              <p className="text-xs text-muted-foreground">Room invitation</p>
+              <p className="text-xs text-muted-foreground">Invited by {invite.hostUsername}</p>
             </CardContent>
 
-            <CardFooter>
-              <Button variant="destructive" size="sm" onClick={() => rejectFriend(fi.id)} disabled={isLoading}>
+            <CardFooter className="gap-2">
+              <Button variant="destructive" size="sm" onClick={() => rejectRoomInvitation(invite.roomId)} disabled={busyId === invite.roomId}>
                 Reject
               </Button>
-
-              <Button className="bg-green-500 text-white-500" size="sm" onClick={() => acceptFriend(fi.id)} disabled={isLoading}>
+              <Button className="bg-green-600 text-white hover:bg-green-700" size="sm" onClick={() => acceptRoomInvitation(invite.roomId)} disabled={busyId === invite.roomId}>
                 Accept
               </Button>
-
-              {error && <p className="text-red-500 font-bold">{error}</p>}
             </CardFooter>
           </Card>
-      ))}
-
-      {RoomInvitations.map((ri) => (
-          <Card key={ri.id} className="hover:opacity-80 cursor-pointer transition-opacity">
-            <CardHeader>  
-              <CardTitle>{ri.roomName}</CardTitle>
-            </CardHeader>
-
-            <CardContent className="flex flex-col gap-5">
-              <p className="text-xs text-muted-foreground">
-                Sent by {ri.hostUsername}
-              </p>
-            </CardContent>
-
-            <CardFooter>
-              <Button variant="destructive" size="sm" onClick={() => rejectRoomIvitation(ri.id)} disabled={isLoading}>
-                Reject
-              </Button>
-
-              <Button className="bg-green-500 text-white-500" size="sm" onClick={() => acceptRoomInvitation(ri.id)} disabled={isLoading}>
-                Accept
-              </Button>
-
-              {error && <p className="text-red-500 font-bold">{error}</p>}
-            </CardFooter>
-          </Card>
-      ))}
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default InboxList
+export default InboxList;

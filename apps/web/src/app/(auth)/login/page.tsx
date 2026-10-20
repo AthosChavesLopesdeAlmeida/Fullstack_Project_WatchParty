@@ -51,7 +51,7 @@ const Page = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-800">
-      <Card className="dark h-[380px] w-[400px] rounded-sm">
+      <Card className="dark h w-[400px] rounded-sm">
         
         <CardHeader>
           <CardTitle className="text-2xl">Log in</CardTitle>

@@ -87,6 +87,7 @@ const UploadVideoForm = () => {
     } catch {
         setError('Unexpected error during the upload')
     } finally {
+        setIsFormOpen(false)
         setIsLoading(false)
     }
   }
