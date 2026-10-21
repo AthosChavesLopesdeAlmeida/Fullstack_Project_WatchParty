@@ -1,0 +1,75 @@
+# Run everything with: docker compose up --build
+# The database (Neon) and the storage (R2) stay outside: they are remote services.
+
+services:
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: api
+    env_file: apps/api/.env
+    environment:
+      # inside the compose network, Redis is reached by its service name
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3333:3333"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  ws-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: ws-server
+    env_file: apps/ws-server/.env
+    environment:
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3334:3334"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: worker
+    env_file: apps/worker/.env
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: web
+      args:
+        # used by the BROWSER, so they point to the ports published on the host
+        NEXT_PUBLIC_API_URL: http://localhost:3333/api
+        NEXT_PUBLIC_WS_URL: ws://localhost:3334
+    environment:
+      # used by the Next.js SERVER (proxy.ts and server components),
+      # which runs inside the network and reaches the API by its service name
+      API_INTERNAL_URL: http://api:3333/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  redis-data:

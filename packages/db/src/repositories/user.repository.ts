@@ -17,11 +17,12 @@ export const userRepository = {
     },
 
     // Precisa do ID do usuário para excluir conta e senha para confirmar
-    async delete (id: string, passwordHash: string) {
-        await db.delete(users).where(
-            and(
-                eq(users.id, id), eq(users.passwordHash, passwordHash)
-            )
-        )
-    }
+    async delete(userId: string) {
+        const deleted = await db
+            .delete(users)
+            .where(eq(users.id, userId))
+            .returning({ id: users.id });
+
+        return deleted.length > 0;
+    },
 }

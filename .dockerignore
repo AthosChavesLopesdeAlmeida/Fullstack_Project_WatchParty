@@ -1,0 +1,14 @@
+# Dependencies and builds are generated inside the image.
+# Copying the Windows node_modules would break native modules like bcrypt.
+**/node_modules
+**/.next
+**/dist
+
+# Secrets never go into an image. Compose injects them at runtime (env_file).
+**/.env
+**/.env.*
+
+.git
+.github
+.vscode
+**/*.log

@@ -7,9 +7,8 @@ async function isTokenValid(token: string | undefined): Promise<boolean> {
   if (!token) return false;
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify`, {
-      headers: { Cookie: `token=${token}` },
-    });
+    const apiUrl = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL;
+    const res = await fetch(`${apiUrl}/auth/verify`, { headers: { Cookie: `token=${token}` } });
     return res.ok;
   } catch {
     // servidor da API fora do ar, ou erro de rede — trata como não autenticado

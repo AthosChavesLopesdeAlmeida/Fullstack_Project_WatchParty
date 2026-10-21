@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-import { PlusCircleIcon } from '@phosphor-icons/react'
+import { PlusCircleIcon } from 'lucide-react'   
 
 const AddFriendForm = () => {
   const [isFormOpen, setIsFormOpen] = useState(false)  

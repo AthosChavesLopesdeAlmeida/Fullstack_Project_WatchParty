@@ -57,7 +57,7 @@ export const authController = {
 
         try {
             const { password } = deleteSchema.parse(req.body);
-            await authService.delete(userId, { password });
+            await authService.delete(userId, password );
             res.clearCookie("token", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax", path: "/" });
             res.status(200).json({ ok: true });
         } catch {

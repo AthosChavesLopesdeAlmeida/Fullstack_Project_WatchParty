@@ -1,4 +1,4 @@
-import { userRepository } from "@watch-party/db";
+import { userRepository, videosRepository } from "@watch-party/db";
 import { DeleteInput, LoginInput, RegisterInput } from "@watch-party/schemas";
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -46,23 +46,16 @@ export const authService = {
         return { user: {id: user.id, username: user.username, email: user.email}, token }
     },
 
-    async delete (id: string, data: DeleteInput) {
-        const { password } = data
-        
-        // Todos os campos são obrigatórios
-        if (!password) {
-            throw new Error('Missing information')
-        }
+    async delete(userId: string, password: string) {
+        const user = await userRepository.findById(userId);
+        if (!user) throw new Error("Account not found");
 
-        // Verifica a existência da conta 
-        const user = await userRepository.findById(id)
-        if (!user) throw new Error('Account not found')
+        const passwordIsValid = await bcrypt.compare(password, user.passwordHash);
+        if (!passwordIsValid) throw new Error("Invalid password");
 
-        // Compara a senha
-        const passwordIsValid = await bcrypt.compare(password, user.passwordHash)
-        if (!passwordIsValid) throw new Error('Invalid password')
+        const deleted = await userRepository.delete(userId);
+        if (!deleted) throw new Error("Account could not be deleted");
 
-        await userRepository.delete(id, password)
     },
 
     async verify(token: string | undefined) {

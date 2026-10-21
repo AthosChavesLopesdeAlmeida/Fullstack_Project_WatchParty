@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-import { UploadIcon } from '@phosphor-icons/react'
+import { UploadIcon } from 'lucide-react' 
 
 const UploadVideoForm = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);

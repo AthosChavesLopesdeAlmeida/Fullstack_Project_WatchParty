@@ -15,7 +15,7 @@ type Props = {
   members: RoomMember[]
 }
 
-type Video = { id: string; title: string }
+type Video = { id: string; videoName: string }
 
 type ApiResult = {
   data: unknown
@@ -102,9 +102,8 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
   }
 
   const changeVideo = async () => {
-    const res = await apiFetch(`/rooms/${roomId}`, {
+    const res = await apiFetch(`/rooms/${roomId}/video/${videoId}`, {
       method: "PATCH",
-      body: { currentVideoId: videoId || null },
     })
     if (!res.ok) return setError(getErrorMessage(res))
     setError(null)
@@ -200,7 +199,7 @@ const ConfigControls = ({ roomId, hostId, currentUserId, currentVideoId, members
                   <option value="">{videosLoaded ? "No video" : "Loading videos..."}</option>
                   {videos.map((v) => (
                     <option key={v.id} value={v.id}>
-                      {v.title}
+                      {v.videoName}
                     </option>
                   ))}
                 </select>

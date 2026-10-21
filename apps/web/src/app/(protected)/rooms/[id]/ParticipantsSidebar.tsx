@@ -1,5 +1,5 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { CrownIcon } from "@phosphor-icons/react/dist/ssr";
+import { Crown } from "lucide-react";
 
 export type RoomMember = {
   userId: string;
@@ -63,7 +63,7 @@ const ParticipantsSidebar = ({
                     {member.userId === currentUserId && " (you)"}
                     </span>
                     {member.userId === hostId && (
-                    <span className="text-xs text-amber-400">Host <CrownIcon/></span>
+                    <span className="text-xs text-amber-400">Host <Crown/></span>
                     )}
                 </div>
                 </li>

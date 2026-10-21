@@ -14,7 +14,8 @@ export async function serverFetch<T>(path: string): Promise<ServerResponse<T>> {
   if (!token) return { ok: false, status: 401, data: null, error: "Not authenticated" };
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+    const apiUrl = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL;
+    const res = await fetch(`${apiUrl}${path}`, {
       headers: { Cookie: `token=${token}` },
       cache: "no-store",
     });

@@ -47,9 +47,9 @@ const Page = async () => {
             <div className='flex flex-row gap-4'>
                 <a href="/rooms" className='opacity-40 hover:opacity-100 transition-all duration-300'>Rooms</a>
                 <a href="/friends" className='opacity-40 hover:opacity-100 transition-all duration-300'>Friends</a>
-                <a href="/videos" className='border-b-1 hover:border-b-2 transition-all duration-300'>Videos</a>
+                <a href="/videos" className='opacity-40 hover:opacity-100 transition-all duration-300'>Videos</a>
                 <a href="/profile" className='opacity-40 hover:opacity-100 transition-all duration-300'>Profile</a>
-                <a href="/inbox" className='opacity-40 hover:opacity-100 transition-all duration-300'>Inbox</a>
+                <a href="/inbox" className='border-b-1 hover:border-b-2 transition-all duration-300'>Inbox</a>
             </div>
         </header>
 
