@@ -12,3 +12,4 @@
 .github
 .vscode
 **/*.log
+**/*.tsbuildinfo
