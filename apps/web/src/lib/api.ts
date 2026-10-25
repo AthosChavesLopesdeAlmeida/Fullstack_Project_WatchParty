@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
 type ApiFetchOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
 type ApiResponse<T> = {

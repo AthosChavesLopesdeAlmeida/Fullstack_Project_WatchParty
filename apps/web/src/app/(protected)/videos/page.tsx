@@ -1,4 +1,5 @@
-import { cookies } from "next/headers";
+import type { ComponentProps } from "react";
+import { serverFetch } from "@/lib/server-api";
 
 import {  
     Card,
@@ -11,21 +12,11 @@ import {
 import UploadVideoForm from './UploadVideoForm'
 import VideosList from './VideosList'
 
+type Videos = ComponentProps<typeof VideosList>["initialVideos"];
+
 const Page = async () => {
-    async function getVideos(token: string) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/videos`, {
-            headers: { Cookie: `token=${token}` },
-            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.videos ?? data; 
-    }
-
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    const videos = token ? await getVideos(token) : [];
+  const res = await serverFetch<{ videos: Videos } | Videos>("/videos");
+  const videos: Videos = Array.isArray(res.data) ? res.data : (res.data?.videos ?? []);
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">
@@ -50,7 +41,7 @@ const Page = async () => {
                 <CardDescription className='w-140'>
                     Here you can see all of the videos that you have uploaded. 
                     You want to upload a new video to watch with your friends?
-                    Use the button 'Upload video' and use the video's URL to upload!
+                    Use the button 'Upload video' and select a file from your computer!
                 </CardDescription>
             </CardHeader>
             <CardContent>

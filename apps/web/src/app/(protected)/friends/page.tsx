@@ -1,4 +1,6 @@
-import { cookies } from "next/headers";
+import type { ComponentProps } from "react";
+import { serverFetch } from "@/lib/server-api";
+
 import {  
     Card,
     CardHeader,
@@ -10,20 +12,12 @@ import {
 import { FriendsList } from "./FriendsList";
 import AddFriendForm from './AddFriendForm'
 
-async function getFriends(token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
-    headers: { Cookie: `token=${token}` },
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.friends ?? [];
-}
+type Friends = ComponentProps<typeof FriendsList>["initialFriends"];
+
 
 const page = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-  const friends = token ? await getFriends(token) : [];
+  const res = await serverFetch<{ friends: Friends }>("/friends");
+  const friends = res.data?.friends ?? [];
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">

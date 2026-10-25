@@ -1,4 +1,5 @@
-import { cookies } from "next/headers";
+import type { ComponentProps } from "react";
+import { serverFetch } from "@/lib/server-api";
 
 import {  
     Card,
@@ -11,21 +12,14 @@ import {
 import CreateRoomForm  from './CreateRoomForm'
 import RoomsList from './RoomsList'
 
+
+type Rooms = ComponentProps<typeof RoomsList>["initialRooms"];
+
+
 const Page = async () => {
-    async function getRooms(token: string) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms`, {
-            headers: { Cookie: `token=${token}` },
-            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.rooms ?? data; 
-    }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const rooms = token ? await getRooms(token) : [];
+  const res = await serverFetch<{ rooms: Rooms }>("/rooms");
+  const rooms = res.data?.rooms ?? [];
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-800 p-4 gap-4">

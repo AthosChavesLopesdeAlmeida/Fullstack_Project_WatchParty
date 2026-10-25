@@ -1,4 +1,5 @@
-import { cookies } from "next/headers";
+import type { ComponentProps } from "react";
+import { serverFetch } from "@/lib/server-api";
 
 import {  
     Card,
@@ -10,33 +11,17 @@ import {
 
 import InboxList from "./InboxList";
 
+type InboxProps = ComponentProps<typeof InboxList>;
+
 
 const Page = async () => {
-    async function getFriendInvitations(token: string) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends/pending`, {
-            headers: { Cookie: `token=${token}` },
-            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.pendingRequests ?? data; 
-    }
+    const [friendsRes, roomsRes] = await Promise.all([
+    serverFetch<{ pendingRequests: InboxProps["FriendshipInvitations"] }>("/friends/pending"),
+    serverFetch<{ invites: InboxProps["RoomInvitations"] }>("/rooms/invites"),
+    ]);
 
-    async function getRoomInvitations(token: string) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/invites`, {
-            headers: { Cookie: `token=${token}` },
-            cache: "no-store", // dados sempre atuais, nunca cacheados entre usuários diferentes
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.invites ?? data; 
-    }
-
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    const friendhipInvites = token ? await getFriendInvitations(token) : [];
-    const roomInvites = token ? await getRoomInvitations(token) : [];
+    const friendInvites = friendsRes.data?.pendingRequests ?? [];
+    const roomInvites = roomsRes.data?.invites ?? [];
 
 
   return (
@@ -65,7 +50,7 @@ const Page = async () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <InboxList FriendshipInvitations={friendhipInvites} RoomInvitations={roomInvites}/>
+                <InboxList FriendshipInvitations={friendInvites} RoomInvitations={roomInvites}/>
             </CardContent>
         </Card>
     </div>
